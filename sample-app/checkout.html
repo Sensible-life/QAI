@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- 체크아웃 퍼널의 입력 검증, 결제 API, 약관 링크 버그를 재현한다. -->
+    <div class="shell">
+      <nav class="nav">
+        <strong>Sample Commerce</strong>
+        <div class="nav-links">
+          <a href="./index.html">Home</a>
+          <a href="./login.html">Login</a>
+          <a href="./contact.html">Contact</a>
+        </div>
+      </nav>
+
+      <section class="panel">
+        <h1>Checkout</h1>
+        <p>This page simulates a high-risk commerce funnel with intentional defects.</p>
+        <form id="checkout-form">
+          <label>
+            <span>Name</span>
+            <input id="name" type="text" value="QA Tester" />
+          </label>
+          <label>
+            <span>Address</span>
+            <input id="address" type="text" value="Seoul QA Street 101" />
+          </label>
+          <label>
+            <span>ZIP code</span>
+            <input id="zip" type="text" value="" />
+          </label>
+          <p id="zip-error" class="error-copy hidden">Please enter your ZIP code.</p>
+          <label>
+            <span>Card number</span>
+            <input id="card" type="text" value="4242 4242 4242 4242" />
+          </label>
+          <button id="checkout-submit" type="submit">Place order</button>
+        </form>
+        <p>
+          <a id="policy-link" href="/sample-app/policies/checkot-terms.html" target="_blank" rel="noreferrer">
+            View policy
+          </a>
+        </p>
+      </section>
+    </div>
+
+    <script>
+      const form = document.getElementById("checkout-form");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const zip = document.getElementById("zip").value.trim();
+
+        if (!zip) {
+          // 의도적 버그: validation element는 있지만 화면에는 노출하지 않는다.
+          return;
+        }
+
+        try {
+          await fetch("/sample-api/payments/confirm", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ zip }),
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    </script>
+  </body>
+</html>

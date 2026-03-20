@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- 폼 제출 후 성공 피드백이 너무 짧게 보이는 문제를 재현한다. -->
+    <div class="shell">
+      <nav class="nav">
+        <strong>Sample Commerce</strong>
+        <div class="nav-links">
+          <a href="./index.html">Home</a>
+          <a href="./login.html">Login</a>
+          <a href="./checkout.html">Checkout</a>
+        </div>
+      </nav>
+
+      <section class="panel">
+        <h1>Contact</h1>
+        <form id="contact-form">
+          <label>
+            <span>Name</span>
+            <input id="contact-name" type="text" value="QA Tester" />
+          </label>
+          <label>
+            <span>Phone</span>
+            <input id="phone" type="text" value="01012" />
+          </label>
+          <label>
+            <span>Message</span>
+            <textarea id="message">Shipping question test</textarea>
+          </label>
+          <button id="contact-submit" type="submit">Send inquiry</button>
+        </form>
+      </section>
+    </div>
+
+    <script>
+      const form = document.getElementById("contact-form");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          await fetch("/sample-api/contact", { method: "POST" });
+          const toast = document.createElement("div");
+          toast.className = "toast";
+          toast.textContent = "Inquiry submitted.";
+          document.body.appendChild(toast);
+          // 의도적 버그: 성공 토스트가 너무 빨리 사라져 사용자가 확인하기 어렵다.
+          setTimeout(() => toast.remove(), 500);
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    </script>
+  </body>
+</html>

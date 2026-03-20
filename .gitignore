@@ -1,0 +1,7 @@
+node_modules/
+artifacts/
+data/
+public/
+
+.DS_Store
+Thumbs.db

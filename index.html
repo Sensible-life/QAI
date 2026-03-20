@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QAI Release Gate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- 메인 대시보드: 시장 맥락, 제품 설명, 실제 실행 데모를 한 화면에 배치한다. -->
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">Q</div>
+          <div>
+            <p class="eyebrow">Agentic Quality</p>
+            <h1>QAI Release Gate</h1>
+          </div>
+        </div>
+        <nav class="topnav">
+          <a href="#market">Market</a>
+          <a href="#questions">Investor Lens</a>
+          <a href="#demo">Product Demo</a>
+        </nav>
+      </header>
+
+      <main>
+        <!-- 서비스의 포지셔닝과 wedge를 보여 주는 상단 영역 -->
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Preview QA For Shipping Teams</p>
+            <h2>Block risky releases before users find the bug.</h2>
+            <p class="hero-text">
+              QAI is not a general-purpose test automation suite. It is an agentic release gate for teams without
+              dedicated QA. Give it a preview URL, a test account, and a target funnel. It runs the flow, collects
+              evidence, verifies failures, and returns a shipping verdict.
+            </p>
+            <div class="hero-points">
+              <span>Preview URLs only</span>
+              <span>High-risk funnels only</span>
+              <span>Release verdict output</span>
+            </div>
+          </div>
+          <aside class="hero-panel">
+            <div class="hero-panel-card">
+              <p class="eyebrow">v1 Wedge</p>
+              <h3>Agentic QA for login, checkout, and form submission</h3>
+              <ul>
+                <li>Buyer: startup teams shipping without QA headcount</li>
+                <li>Input: URL, account, funnel, environment</li>
+                <li>Output: findings, evidence, and deploy or hold verdict</li>
+              </ul>
+            </div>
+          </aside>
+        </section>
+
+        <!-- 왜 이 MVP가 유효한지 설명하는 시장/포지셔닝 영역 -->
+        <section class="section" id="market">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Why This MVP</p>
+              <h3>Start narrow, own the last mile before production.</h3>
+            </div>
+            <a class="text-link" href="./docs/market-research.md">Open market research</a>
+          </div>
+          <div class="insight-grid" id="insight-grid"></div>
+          <div class="positioning-grid">
+            <article class="panel">
+              <p class="eyebrow">Must Have</p>
+              <h4>What makes this MVP actually competitive</h4>
+              <ul class="bullet-list">
+                <li>Immediate execution from URL and account only</li>
+                <li>High-risk funnel templates with minimal setup</li>
+                <li>Evidence pack across screenshots, console, and network</li>
+                <li>False-positive control through verification</li>
+                <li>Release verdict instead of vague bug output</li>
+              </ul>
+            </article>
+            <article class="panel">
+              <p class="eyebrow">Not In v1</p>
+              <h4>What we intentionally leave out</h4>
+              <ul class="bullet-list">
+                <li>General no-code test builder</li>
+                <li>Full browser-device matrix</li>
+                <li>Site-wide autonomous crawling</li>
+                <li>Heavy enterprise governance</li>
+                <li>Human-authored test maintenance loops</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- 심사위원이나 투자자가 물을 만한 질문을 정리한 영역 -->
+        <section class="section" id="questions">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Investor Lens</p>
+              <h3>The questions this product has to answer convincingly</h3>
+            </div>
+          </div>
+          <div class="qa-grid" id="qa-grid"></div>
+        </section>
+
+        <!-- 실제 API와 연결된 agentic run 데모 영역 -->
+        <section class="section" id="demo">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Interactive Demo</p>
+              <h3>Run the agentic workflow against a real target</h3>
+            </div>
+          </div>
+
+          <div class="demo-layout">
+            <section class="panel control-panel">
+              <div class="control-copy">
+                <h4>Run Input</h4>
+                <p>
+                  v1 avoids prompt-heavy setup. The product asks for the minimum required to make a shipping decision.
+                </p>
+              </div>
+              <form id="qa-form" class="qa-form">
+                <label>
+                  <span>Preview / Staging URL</span>
+                  <input
+                    id="url-input"
+                    name="url"
+                    type="url"
+                    placeholder="http://localhost:3000/sample-app/"
+                    required
+                  />
+                </label>
+                <label>
+                  <span>Test account email</span>
+                  <input id="account-input" name="account" type="email" placeholder="qa@example.com" value="qa@sample.app" />
+                </label>
+                <label>
+                  <span>Test account password</span>
+                  <input
+                    id="password-input"
+                    name="password"
+                    type="password"
+                    placeholder="password123!"
+                    value="demo1234!"
+                  />
+                </label>
+                <label>
+                  <span>Environment</span>
+                  <select id="environment-input" name="environment">
+                    <option value="staging">Staging</option>
+                    <option value="preview">Preview</option>
+                    <option value="production">Production</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Target funnel</span>
+                  <select id="funnel-input" name="funnel">
+                    <option value="login">Login</option>
+                    <option value="checkout" selected>Checkout</option>
+                    <option value="form">Form Submission</option>
+                  </select>
+                </label>
+                <p class="muted">
+                  Built-in target:
+                  <a class="text-link" id="sample-link" href="./sample-app/" target="_blank" rel="noreferrer">
+                    open the sample app
+                  </a>
+                </p>
+                <p class="run-note" id="run-note">No active run. Start a run to generate a live verdict.</p>
+                <button type="submit" id="submit-button" class="primary-button">Start agentic run</button>
+              </form>
+            </section>
+
+            <section class="panel run-panel">
+              <div class="section-head compact">
+                <div>
+                  <p class="eyebrow">Run Summary</p>
+                  <h4 id="report-title">Awaiting run</h4>
+                </div>
+                <span class="status-pill" id="risk-pill">Pending</span>
+              </div>
+              <div class="stats-grid" id="stats-grid"></div>
+              <div class="timeline-box">
+                <p class="timeline-title">Execution path</p>
+                <div class="timeline" id="timeline"></div>
+              </div>
+            </section>
+          </div>
+
+          <section class="panel findings-panel">
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Findings</p>
+                <h4>What blocks the release</h4>
+              </div>
+            </div>
+            <div class="finding-list" id="finding-list"></div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Evidence</p>
+                <h4>Observed signals and screenshots</h4>
+              </div>
+            </div>
+            <div class="history-list" id="observation-list"></div>
+          </section>
+
+          <section class="architecture-grid">
+            <article class="panel">
+              <p class="eyebrow">Live Run</p>
+              <h4>Agent log</h4>
+              <div class="log-list" id="log-list"></div>
+            </article>
+            <article class="panel">
+              <p class="eyebrow">History</p>
+              <h4>Recent runs</h4>
+              <div class="history-list" id="history-list"></div>
+            </article>
+          </section>
+
+          <section class="architecture-grid">
+            <article class="panel">
+              <p class="eyebrow">Agent Workflow</p>
+              <h4>What the product actually does</h4>
+              <ol class="number-list">
+                <li>Discovery scans the page structure and entry conditions.</li>
+                <li>Planner turns the chosen funnel into execution steps and fallbacks.</li>
+                <li>Executor performs the browser actions while Evidence captures signals.</li>
+                <li>Judge and Verifier promote failures into trusted release findings.</li>
+                <li>Reporter turns the run into an explicit deploy or hold decision.</li>
+              </ol>
+            </article>
+            <article class="panel">
+              <p class="eyebrow">Design Constraint</p>
+              <h4>What makes the agent trustworthy</h4>
+              <ul class="bullet-list">
+                <li>Deterministic execution for low-level browser actions</li>
+                <li>Agentic planning and interpretation at the orchestration layer</li>
+                <li>High-severity findings require verification</li>
+                <li>Evidence is stored per step with screenshots and network issues</li>
+              </ul>
+            </article>
+          </section>
+
+          <section class="panel">
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Build Spec</p>
+                <h4>The v1 product spec</h4>
+              </div>
+              <a class="text-link" href="./docs/mvp-scope.md">Open MVP scope</a>
+            </div>
+            <div class="positioning-grid" id="spec-grid"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./public/app.js"></script>
+  </body>
+</html>

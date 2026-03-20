@@ -1,0 +1,152 @@
+/* 샘플 앱은 QAI가 실제로 탐색할 타깃 UI이므로 구조가 단순하고 명확해야 한다. */
+body {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", "Noto Sans KR", sans-serif;
+  color: #171717;
+  background: linear-gradient(180deg, #f7f4ec 0%, #efe8d8 100%);
+}
+
+.shell {
+  width: min(980px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(23, 23, 23, 0.08);
+}
+
+.nav-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nav a {
+  color: #171717;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.hero,
+.panel {
+  margin-top: 18px;
+  padding: 28px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  box-shadow: 0 20px 50px rgba(50, 39, 20, 0.08);
+}
+
+.hero h1,
+.panel h1,
+.panel h2 {
+  margin: 0 0 10px;
+  font-family: "Space Grotesk", "Plus Jakarta Sans", sans-serif;
+}
+
+.hero p,
+.panel p,
+.panel li,
+label span {
+  color: #5d564c;
+  line-height: 1.65;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.card {
+  padding: 20px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff, #f8f4eb);
+  border: 1px solid rgba(23, 23, 23, 0.08);
+}
+
+form {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-weight: 700;
+}
+
+input,
+button,
+textarea {
+  min-height: 52px;
+  border-radius: 14px;
+  border: 1px solid rgba(23, 23, 23, 0.12);
+  font: inherit;
+}
+
+input,
+textarea {
+  padding: 0 14px;
+  background: #fff;
+}
+
+textarea {
+  padding-top: 12px;
+  min-height: 140px;
+}
+
+button {
+  background: linear-gradient(135deg, #0f5f4f, #177f69);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ghost {
+  background: #fff;
+  color: #171717;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.error-copy {
+  min-height: 20px;
+  font-size: 0.95rem;
+  color: #cb4b2f;
+}
+
+.hidden {
+  display: none;
+}
+
+.toast {
+  /* 폼 제출 성공 피드백을 일부러 짧게 노출해 버그를 재현한다. */
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: #171717;
+  color: #fff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+}
+
+@media (max-width: 800px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

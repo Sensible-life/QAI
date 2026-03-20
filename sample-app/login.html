@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- 로그인 퍼널 버그를 재현하기 위한 테스트 페이지다. -->
+    <div class="shell">
+      <nav class="nav">
+        <strong>Sample Commerce</strong>
+        <div class="nav-links">
+          <a href="./index.html">Home</a>
+          <a href="./checkout.html">Checkout</a>
+          <a href="./contact.html">Contact</a>
+        </div>
+      </nav>
+
+      <section class="panel">
+        <h1>Login</h1>
+        <p>Test account: <code>qa@sample.app / demo1234!</code></p>
+        <form id="login-form">
+          <label>
+            <span>Email</span>
+            <input id="email" type="email" value="qa@sample.app" />
+          </label>
+          <label>
+            <span>Password</span>
+            <input id="password" type="password" value="demo1234!" />
+          </label>
+          <div class="row">
+            <button id="login-submit" type="submit">Log in</button>
+            <a class="ghost" href="./reset-pasword.html">Forgot password</a>
+          </div>
+          <p class="error-copy" id="login-error"></p>
+        </form>
+      </section>
+    </div>
+
+    <script>
+      const form = document.getElementById("login-form");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        try {
+          await fetch("/sample-api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          // 의도적 버그: 성공 이동도 없고, 사용자에게 명확한 실패 안내도 없다.
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    </script>
+  </body>
+</html>

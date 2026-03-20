@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sample App</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- QAI가 실제로 탐색할 샘플 앱의 랜딩 페이지다. -->
+    <div class="shell">
+      <nav class="nav">
+        <strong>Sample Commerce</strong>
+        <div class="nav-links">
+          <a href="./login.html">Login</a>
+          <a href="./checkout.html">Checkout</a>
+          <a href="./contact.html">Contact</a>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <h1>QAI Demo Target</h1>
+        <p>
+          This sample app contains intentional defects for the QAI demo. Each funnel exposes a different failure so the
+          agent can discover, judge, and report real findings.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <h2>Login</h2>
+            <p>Submitting the form does not establish a session and shows almost no useful feedback.</p>
+          </div>
+          <div class="card">
+            <h2>Checkout</h2>
+            <p>The payment confirmation request returns a 500 response and the policy link is broken.</p>
+          </div>
+          <div class="card">
+            <h2>Contact</h2>
+            <p>The success toast disappears too quickly for the user to trust the submission.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
