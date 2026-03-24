@@ -233,6 +233,13 @@ body::before {
   margin-bottom: 20px;
 }
 
+.panel-copy {
+  margin: 10px 0 0;
+  max-width: 52ch;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .insight-grid,
 .qa-grid,
 .stats-grid,
@@ -345,7 +352,8 @@ body::before {
 }
 
 .qa-form input,
-.qa-form select {
+.qa-form select,
+.qa-form textarea {
   width: 100%;
   min-height: 52px;
   padding: 0 16px;
@@ -354,6 +362,12 @@ body::before {
   background: #fff;
   color: var(--text);
   font: inherit;
+}
+
+.qa-form textarea {
+  min-height: 110px;
+  padding: 14px 16px;
+  resize: vertical;
 }
 
 .primary-button {
@@ -534,6 +548,11 @@ body::before {
 .tag.medium {
   color: var(--warning);
   background: var(--warning-soft);
+}
+
+.tag.safe {
+  color: var(--primary);
+  background: rgba(15, 95, 79, 0.12);
 }
 
 .finding-meta {

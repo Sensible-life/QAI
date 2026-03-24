@@ -7,4 +7,5 @@ export const runInputSchema = z.object({
   password: z.string().default(""),
   environment: z.enum(["preview", "staging", "production"]).default("staging"),
   funnel: z.enum(["login", "checkout", "form"]).default("checkout"),
+  priorityNote: z.string().trim().max(240).default(""),
 });

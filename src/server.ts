@@ -3,6 +3,7 @@ import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import path from "node:path";
 import { runInputSchema } from "./domain/schemas";
 import { RunOrchestrator } from "./orchestrator/run-orchestrator";
+import { RunQueue } from "./queue/run-queue";
 import { RunStore } from "./store/run-store";
 
 // 별도 프레임워크 없이 정적 파일과 API를 함께 서빙하는 v1 엔트리 서버다.
@@ -10,6 +11,7 @@ const root = process.cwd();
 const port = Number(process.env.PORT || 3000);
 const runStore = new RunStore();
 const runOrchestrator = new RunOrchestrator(runStore);
+const runQueue = new RunQueue();
 
 const mimeTypes: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -98,13 +100,24 @@ async function handleApi(request: IncomingMessage, response: ServerResponse, pat
       sendJson(response, 400, { error: parsed.error.issues[0]?.message ?? "Invalid input" });
       return true;
     }
-    const run = await runOrchestrator.start(parsed.data);
+    const run = runOrchestrator.create(parsed.data);
+    runQueue.enqueue({
+      id: run.id,
+      run: async () => {
+        await runOrchestrator.process(run.id);
+      },
+    });
     sendJson(response, 201, { id: run.id });
     return true;
   }
 
   if (request.method === "GET" && pathname === "/api/test-runs") {
     sendJson(response, 200, { items: runStore.list() });
+    return true;
+  }
+
+  if (request.method === "GET" && pathname === "/api/system/queue") {
+    sendJson(response, 200, runQueue.getSnapshot());
     return true;
   }
 

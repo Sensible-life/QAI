@@ -1,16 +1,59 @@
 import type { Finding, FunnelType, Observation, PlanStep } from "../domain/contracts";
+import { collectFocusAreas } from "../domain/focus-map";
+
+function prioritizeFindings(funnel: FunnelType, priorityNote: string, findings: Finding[]): Finding[] {
+  const focusAreas = collectFocusAreas(funnel, priorityNote);
+
+  if (!focusAreas.length) {
+    return findings.sort((left, right) => {
+      if (left.severity !== right.severity) {
+        return left.severity === "high" ? -1 : 1;
+      }
+      return right.confidence - left.confidence;
+    });
+  }
+
+  return findings
+    .map((finding) => {
+      const haystack = `${finding.title} ${finding.summary} ${finding.location} ${finding.evidence}`.toLowerCase();
+      const matchedFocusAreas = focusAreas
+        .filter((focus) => focus.keywords.some((keyword) => haystack.includes(keyword)))
+        .map((focus) => focus.label);
+
+      return {
+        ...finding,
+        matchesRequestedFocus: matchedFocusAreas.length > 0,
+        matchedFocusAreas,
+      };
+    })
+    .sort((left, right) => {
+      if (Boolean(left.matchesRequestedFocus) !== Boolean(right.matchesRequestedFocus)) {
+        return left.matchesRequestedFocus ? -1 : 1;
+      }
+      if (left.severity !== right.severity) {
+        return left.severity === "high" ? -1 : 1;
+      }
+      return right.confidence - left.confidence;
+    });
+}
 
 // Judge는 raw evidence를 사람이 읽을 수 있는 finding으로 승격한다.
 export class JudgeAgent {
-  judge(funnel: FunnelType, _plan: PlanStep[], observations: Observation[], runtimeFacts: string[]): Finding[] {
+  judge(
+    funnel: FunnelType,
+    _plan: PlanStep[],
+    observations: Observation[],
+    runtimeFacts: string[],
+    priorityNote = "",
+  ): Finding[] {
     if (funnel === "checkout") {
-      return this.judgeCheckout(observations, runtimeFacts);
+      return prioritizeFindings(funnel, priorityNote, this.judgeCheckout(observations, runtimeFacts));
     }
     if (funnel === "login") {
-      return this.judgeLogin(observations, runtimeFacts);
+      return prioritizeFindings(funnel, priorityNote, this.judgeLogin(observations, runtimeFacts));
     }
     if (funnel === "form") {
-      return this.judgeForm(observations, runtimeFacts);
+      return prioritizeFindings(funnel, priorityNote, this.judgeForm(observations, runtimeFacts));
     }
     return [];
   }

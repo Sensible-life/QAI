@@ -20,6 +20,7 @@ export type RunInput = {
   password: string;
   environment: EnvironmentType;
   funnel: FunnelType;
+  priorityNote: string;
 };
 
 export type LogEntry = {
@@ -33,6 +34,7 @@ export type PlanStep = {
   goal: string;
   successCriteria: string;
   fallbackActions: string[];
+  priorityHint?: string;
 };
 
 export type DiscoveryArtifact = {
@@ -84,11 +86,16 @@ export type Finding = {
   flow: string[];
   confidence: number;
   verified: boolean;
+  verificationNotes?: string[];
+  matchesRequestedFocus?: boolean;
+  matchedFocusAreas?: string[];
 };
 
 export type RunReport = {
   title: string;
   risk: string;
+  requestSummary: string | null;
+  verdictReason: string;
   stats: Array<{
     label: string;
     value: string;

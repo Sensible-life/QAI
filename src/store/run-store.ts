@@ -28,7 +28,24 @@ export class RunStore {
     const raw = fs.readFileSync(runFile, "utf8");
     const items = JSON.parse(raw) as RunRecord[];
     items.forEach((item) => {
-      this.runs.set(item.id, item);
+      this.runs.set(item.id, {
+        ...item,
+        input: {
+          ...item.input,
+          priorityNote: item.input.priorityNote ?? "",
+        },
+        plan: item.plan.map((step) => ({
+          ...step,
+          priorityHint: step.priorityHint,
+        })),
+        report: item.report
+          ? {
+              ...item.report,
+              requestSummary: item.report.requestSummary ?? null,
+              verdictReason: item.report.verdictReason ?? "The verdict is based on verified funnel evidence collected during the run.",
+            }
+          : null,
+      });
     });
   }
 

@@ -15,9 +15,21 @@ const browserCandidates = [
   "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
   "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
   "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+  "/Applications/Chromium.app/Contents/MacOS/Chromium",
+  "/usr/bin/google-chrome",
+  "/usr/bin/google-chrome-stable",
+  "/usr/bin/microsoft-edge",
+  "/snap/bin/chromium",
 ];
 
 export function getBrowserExecutable(): string | undefined {
+  const override = process.env.PLAYWRIGHT_BROWSER_PATH;
+  if (override && fs.existsSync(override)) {
+    return override;
+  }
+
   return browserCandidates.find((candidate) => fs.existsSync(candidate));
 }
 

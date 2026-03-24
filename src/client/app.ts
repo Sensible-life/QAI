@@ -37,6 +37,7 @@ type PlanStep = {
   goal: string;
   successCriteria: string;
   fallbackActions: string[];
+  priorityHint?: string;
 };
 
 type Observation = {
@@ -59,11 +60,16 @@ type Finding = {
   flow: string[];
   confidence: number;
   verified: boolean;
+  verificationNotes?: string[];
+  matchesRequestedFocus?: boolean;
+  matchedFocusAreas?: string[];
 };
 
 type RunReport = {
   title: string;
   risk: string;
+  requestSummary: string | null;
+  verdictReason: string;
   stats: Array<{ label: string; value: string }>;
   steps: string[];
   findings: Finding[];
@@ -78,6 +84,7 @@ type RunRecord = {
     password: string;
     environment: EnvironmentType;
     funnel: FunnelType;
+    priorityNote: string;
   };
   status: RunStatus;
   phase: RunPhase;
@@ -166,8 +173,8 @@ const investorQuestions: GridItem[] = [
 const specSections: GridItem[] = [
   {
     eyebrow: "Input",
-    title: "URL, account, environment, funnel",
-    body: "v1 deliberately avoids natural-language setup and instead asks for the minimum needed to execute a reliable run.",
+    title: "URL, account, environment, and requested focus",
+    body: "v1 keeps setup small, but now accepts one-line guidance so the run can emphasize the risk area the team actually cares about.",
   },
   {
     eyebrow: "Workflow",
@@ -192,10 +199,12 @@ const accountInput = document.querySelector<HTMLInputElement>("#account-input");
 const passwordInput = document.querySelector<HTMLInputElement>("#password-input");
 const environmentInput = document.querySelector<HTMLSelectElement>("#environment-input");
 const funnelInput = document.querySelector<HTMLSelectElement>("#funnel-input");
+const priorityNoteInput = document.querySelector<HTMLTextAreaElement>("#priority-note-input");
 const sampleLink = document.querySelector<HTMLAnchorElement>("#sample-link");
 const submitButton = document.querySelector<HTMLButtonElement>("#submit-button");
 const runNote = document.querySelector<HTMLElement>("#run-note");
 const reportTitle = document.querySelector<HTMLElement>("#report-title");
+const reportSummary = document.querySelector<HTMLElement>("#report-summary");
 const riskPill = document.querySelector<HTMLElement>("#risk-pill");
 const statsGrid = document.querySelector<HTMLElement>("#stats-grid");
 const timeline = document.querySelector<HTMLElement>("#timeline");
@@ -223,10 +232,12 @@ const dom = {
   passwordInput: requireElement(passwordInput, "password-input"),
   environmentInput: requireElement(environmentInput, "environment-input"),
   funnelInput: requireElement(funnelInput, "funnel-input"),
+  priorityNoteInput: requireElement(priorityNoteInput, "priority-note-input"),
   sampleLink: requireElement(sampleLink, "sample-link"),
   submitButton: requireElement(submitButton, "submit-button"),
   runNote: requireElement(runNote, "run-note"),
   reportTitle: requireElement(reportTitle, "report-title"),
+  reportSummary: requireElement(reportSummary, "report-summary"),
   riskPill: requireElement(riskPill, "risk-pill"),
   statsGrid: requireElement(statsGrid, "stats-grid"),
   timeline: requireElement(timeline, "timeline"),
@@ -371,11 +382,22 @@ function renderFindings(run: RunRecord): void {
               <h5>${escapeHtml(finding.title)}</h5>
               <span class="tag ${escapeHtml(finding.severity)}">${escapeHtml(finding.severity.toUpperCase())}</span>
               <span class="tag">${finding.verified ? "Verified" : "Candidate"}</span>
+              ${finding.matchesRequestedFocus ? '<span class="tag safe">Requested focus</span>' : ""}
             </div>
           </div>
           <p class="finding-copy">${escapeHtml(finding.summary)}</p>
           <p class="finding-meta">${escapeHtml(finding.location)}</p>
           <p class="finding-meta">Confidence: ${Math.round(finding.confidence * 100)}%</p>
+          ${
+            finding.matchedFocusAreas?.length
+              ? `<p class="finding-meta">Focus match: ${escapeHtml(finding.matchedFocusAreas.join(", "))}</p>`
+              : ""
+          }
+          ${
+            finding.verificationNotes?.length
+              ? `<p class="finding-meta">Verification: ${escapeHtml(finding.verificationNotes.join(" "))}</p>`
+              : ""
+          }
           <p class="finding-meta">${escapeHtml(finding.evidence)}</p>
           <div class="flow-box">
             <h6>Reproduction flow</h6>
@@ -520,11 +542,12 @@ function renderRun(run: RunRecord): void {
           : "progress";
 
   dom.reportTitle.textContent = title;
+  dom.reportSummary.textContent = run.report?.verdictReason ?? "The verdict will explain how the run maps to release risk.";
   dom.riskPill.textContent = risk;
   dom.riskPill.className = `status-pill ${riskClass}`;
   dom.runNote.textContent =
     run.status === "running"
-      ? `${phaseLabel(run.phase)} in progress · ${run.progress}%`
+      ? `${phaseLabel(run.phase)} in progress · ${run.progress}%${run.input.priorityNote ? ` · Focus: ${run.input.priorityNote}` : ""}`
       : run.status === "failed"
         ? `Run failed: ${run.error ?? "unknown error"}`
         : `Run completed · ${run.report?.risk ?? "No verdict"}`;
@@ -599,6 +622,7 @@ async function createRun(): Promise<void> {
     password: dom.passwordInput.value,
     environment: dom.environmentInput.value as EnvironmentType,
     funnel: dom.funnelInput.value as FunnelType,
+    priorityNote: dom.priorityNoteInput.value.trim(),
   };
 
   try {
@@ -653,6 +677,7 @@ async function bootstrap(): Promise<void> {
       password: "",
       environment: "staging",
       funnel: "checkout",
+      priorityNote: "Focus on payment reliability and visible validation.",
     },
     status: "queued",
     phase: "queued",

@@ -53,7 +53,7 @@
               <h3>Agentic QA for login, checkout, and form submission</h3>
               <ul>
                 <li>Buyer: startup teams shipping without QA headcount</li>
-                <li>Input: URL, account, funnel, environment</li>
+                <li>Input: URL, account, funnel, environment, requested focus</li>
                 <li>Output: findings, evidence, and deploy or hold verdict</li>
               </ul>
             </div>
@@ -165,6 +165,16 @@
                     <option value="form">Form Submission</option>
                   </select>
                 </label>
+                <label>
+                  <span>Requested focus</span>
+                  <textarea
+                    id="priority-note-input"
+                    name="priorityNote"
+                    rows="3"
+                    maxlength="240"
+                    placeholder="Example: Focus on payment reliability and whether validation errors are visible."
+                  >Focus on payment reliability and visible validation.</textarea>
+                </label>
                 <p class="muted">
                   Built-in target:
                   <a class="text-link" id="sample-link" href="./sample-app/" target="_blank" rel="noreferrer">
@@ -181,6 +191,9 @@
                 <div>
                   <p class="eyebrow">Run Summary</p>
                   <h4 id="report-title">Awaiting run</h4>
+                  <p class="panel-copy" id="report-summary">
+                    The verdict will explain how the run maps to release risk.
+                  </p>
                 </div>
                 <span class="status-pill" id="risk-pill">Pending</span>
               </div>

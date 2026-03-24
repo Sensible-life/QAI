@@ -53,18 +53,23 @@ export class RunOrchestrator {
     this.runStore.upsert(run);
   }
 
-  async start(input: RunInput): Promise<RunRecord> {
+  create(input: RunInput): RunRecord {
     const run = this.createRun(input);
     this.runStore.upsert(run);
+    return run;
+  }
 
-    // 비동기 실행으로 바로 run id를 반환하고, 실제 브라우저 작업은 뒤에서 계속 진행한다.
-    this.execute(run).catch((error: Error) => {
+  async process(runId: string): Promise<void> {
+    const run = this.runStore.get(runId);
+    if (!run) {
+      throw new Error(`Run not found: ${runId}`);
+    }
+
+    await this.execute(run).catch((error: Error) => {
       run.error = error.message;
       this.transition(run, "failed", 100);
       this.pushLog(run, `Run failed: ${error.message}`);
     });
-
-    return run;
   }
 
   private async runDiscovery(run: RunRecord): Promise<void> {
@@ -95,7 +100,7 @@ export class RunOrchestrator {
     await this.runDiscovery(run);
 
     this.transition(run, "planning", 24);
-    run.plan = this.plannerAgent.buildPlan(run.input.funnel, run.discovery!);
+    run.plan = this.plannerAgent.buildPlan(run.input.funnel, run.discovery!, run.input.priorityNote);
     this.pushLog(run, "Planner Agent built the target funnel plan.");
     this.runStore.upsert(run);
 
@@ -113,11 +118,12 @@ export class RunOrchestrator {
       run.plan,
       run.observations,
       execution.runtimeFacts,
+      run.input.priorityNote,
     );
 
     this.transition(run, "verifying", 82);
     this.pushLog(run, "Verifier is confirming high-confidence issues.");
-    const verifiedFindings = this.verifier.verify(judgedFindings);
+    const verifiedFindings = await this.verifier.verify(run.id, run.input, run.plan, judgedFindings);
 
     this.transition(run, "reporting", 92);
     this.pushLog(run, "Reporter Agent is generating the final release verdict.");
@@ -127,6 +133,7 @@ export class RunOrchestrator {
       hostname,
       run.plan,
       verifiedFindings,
+      run.input.priorityNote,
     );
     this.runStore.upsert(run);
 

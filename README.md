@@ -4,9 +4,10 @@ QAI는 `preview/staging URL`의 핵심 퍼널을 실제 브라우저에서 실�
 
 ## 한 줄 요약
 
-- 입력: URL, 테스트 계정, 환경, 퍼널
+- 입력: URL, 테스트 계정, 환경, 퍼널, 우선 점검 요청 1줄
 - 실행: Discovery -> Planning -> Execution -> Evidence -> Judge -> Verify -> Report
 - 출력: 발견된 이슈, 스크린샷/네트워크/콘솔 증거, `배포 가능 / 보류` 판단
+- 실행 인프라: HTTP 요청과 브라우저 실행은 `RunQueue`로 분리
 
 ## 프로젝트 목적
 
@@ -24,6 +25,9 @@ QAI는 `preview/staging URL`의 핵심 퍼널을 실제 브라우저에서 실�
   - `login`
   - `checkout`
   - `form`
+- 실행 입력
+  - `priorityNote`
+    - 예: `결제 성공 여부와 validation 노출을 우선 확인`
 - 실행 환경
   - `preview`
   - `staging`
@@ -32,6 +36,7 @@ QAI는 `preview/staging URL`의 핵심 퍼널을 실제 브라우저에서 실�
   - finding 목록
   - step별 evidence
   - 실행 로그
+  - verdict reason
   - 최종 verdict
 
 ## Agent Workflow
@@ -41,7 +46,7 @@ QAI v1은 `완전 자유형 agent`가 아니라 `제약된 agent workflow`입니
 1. `Discovery Agent`
    진입 페이지의 제목, 텍스트, 링크, CTA, form 구조를 수집합니다.
 2. `Planner Agent`
-   선택한 퍼널에 맞는 실행 계획을 생성합니다.
+   선택한 퍼널과 우선 점검 요청에 맞는 실행 계획을 생성합니다.
 3. `Browser Executor`
    Playwright로 브라우저를 조작하고 step을 수행합니다.
 4. `Evidence Collector`
@@ -49,7 +54,7 @@ QAI v1은 `완전 자유형 agent`가 아니라 `제약된 agent workflow`입니
 5. `Judge Agent`
    evidence를 finding으로 승격합니다.
 6. `Verifier`
-   high severity 또는 high confidence finding을 검증 상태로 올립니다.
+   high severity 또는 high confidence finding을 최소 step replay로 재검증합니다.
 7. `Reporter Agent`
    최종 리포트와 배포 판단을 생성합니다.
 
@@ -58,6 +63,9 @@ QAI v1은 `완전 자유형 agent`가 아니라 `제약된 agent workflow`입니
 - 저수준 브라우저 액션은 deterministic하게 실행
 - 상위 계획과 판정만 agentic하게 처리
 - high severity finding은 검증 단계를 거쳐서 최종 리포트에 반영
+- 검증 단계는 필요한 step만 다시 실행하는 targeted replay 방식
+- 사용자의 우선 점검 요청은 plan과 report에 반영
+- 우선 점검 요청과 일치하는 finding을 상단에 우선 정렬
 
 ## 파일 구조
 
@@ -90,6 +98,11 @@ QAI v1은 `완전 자유형 agent`가 아니라 `제약된 agent workflow`입니
 
 - [src/orchestrator/run-orchestrator.ts](C:\Users\ChoSungwon\Desktop\dev\QAI\src\orchestrator\run-orchestrator.ts)
   전체 agent workflow를 순서대로 실행하는 상태 머신
+
+#### `src/queue/`
+
+- [src/queue/run-queue.ts](C:\Users\ChoSungwon\Desktop\dev\QAI\src\queue\run-queue.ts)
+  run 실행 작업을 순차 처리하는 in-process queue
 
 #### `src/agents/`
 
@@ -190,8 +203,9 @@ http://localhost:3000
 
 1. 메인 화면에서 기본 샘플 URL을 그대로 사용합니다.
 2. 테스트 계정과 퍼널을 선택합니다.
-3. `Start agentic run`을 누릅니다.
-4. 실행 로그, evidence, findings, verdict를 확인합니다.
+3. 우선 확인하고 싶은 리스크를 한 줄로 입력합니다.
+4. `Start agentic run`을 누릅니다.
+5. 실행 로그, evidence, findings, verdict를 확인합니다.
 
 샘플 앱은 의도적으로 아래 버그를 포함합니다.
 
@@ -216,7 +230,21 @@ run 생성 요청
   "account": "qa@sample.app",
   "password": "demo1234!",
   "environment": "staging",
-  "funnel": "checkout"
+  "funnel": "checkout",
+  "priorityNote": "Focus on payment reliability and visible validation."
+}
+```
+
+### `GET /api/system/queue`
+
+현재 queue 상태 조회
+
+예시 응답:
+
+```json
+{
+  "activeTaskId": "run_1774115688708",
+  "pendingCount": 2
 }
 ```
 
